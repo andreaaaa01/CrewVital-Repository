@@ -11,11 +11,13 @@ window.CREWVITAL_SYNC = {
 };
 
 /* Asistente Kibo (IA con Gemini).
-   1) apiKey: clave de la API de Gemini (se obtiene gratis en https://aistudio.google.com/apikey).
-      Dejala vacia ('') para mostrar a Kibo sin conversacion.
+   1) endpoint: direccion de tu servidor intermedio en Cloudflare
+      (ejemplo: 'https://crewvital-kibo.tu-usuario.workers.dev'). La clave de Gemini
+      se guarda alla, no en este archivo. Dejalo vacio ('') para mostrar a Kibo sin conversacion.
    2) model: modelo de Gemini. 'gemini-flash-latest' usa siempre el Flash mas reciente.
-   Instrucciones y como restringir la clave: ASISTENTE.md */
+   NO pegues aqui la clave de Gemini: este archivo es publico.
+   Instrucciones paso a paso: ASISTENTE.md */
 window.CREWVITAL_AI = {
-  apiKey: 'AQ.Ab8RN6I-Mld8Hkh0jFo-BeCgU9BQaClE5NeIwni8b7ypi1MdCg',
+  endpoint: 'https://crewvital-kibo.crewvitalproyectonasa.workers.dev/',
   model: 'gemini-flash-latest'
 };

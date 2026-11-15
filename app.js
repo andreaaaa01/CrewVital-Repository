@@ -178,7 +178,7 @@
     botLogHint: { es: 'Resúmenes de tus conversaciones con Kibo. El oficial médico también puede verlos.', en: 'Summaries of your conversations with Kibo. The medical officer can also see them.' },
     botTyping: { es: 'Kibo está escribiendo', en: 'Kibo is typing' },
     botErr: { es: 'No pude responder ahora. Revisa la conexión e inténtalo de nuevo.', en: 'I could not answer right now. Check the connection and try again.' },
-    botSetup: { es: 'El asistente aún no está activado. Falta poner la clave de Gemini en config.js (instrucciones en ASISTENTE.md).', en: 'The assistant is not enabled yet. The Gemini key is missing in config.js (instructions in ASISTENTE.md).' },
+    botSetup: { es: 'El asistente aún no está activado. Falta poner la dirección del servidor de Kibo en config.js (instrucciones en ASISTENTE.md).', en: 'The assistant is not enabled yet. The Kibo server address is missing in config.js (instructions in ASISTENTE.md).' },
     botSaved: { es: 'Kibo guardó el resumen de la conversación', en: 'Kibo saved the conversation summary' },
     botQ1: { es: '¿Cómo están mis mediciones de hoy?', en: 'How are my measurements today?' },
     botQ2: { es: 'Quiero conversar un rato', en: 'I want to talk for a while' },
@@ -2266,8 +2266,11 @@
   var AI_CFG = window.CREWVITAL_AI || {};
   var AI_KEY = String(AI_CFG.apiKey || '').trim();
   var AI_MODEL = String(AI_CFG.model || 'gemini-flash-latest').replace(/[^A-Za-z0-9._-]/g, '') || 'gemini-flash-latest';
-  var AI_URL = String(AI_CFG.endpoint || 'https://generativelanguage.googleapis.com/v1beta').replace(/\/+$/, '');
-  var AI_ON = !!(AI_KEY && window.fetch);
+  /* endpoint: direccion del servidor intermedio (Cloudflare Worker) que guarda la clave. Recomendado.
+     Sin endpoint, la app habla directo con Google y necesita apiKey (queda visible en el sitio). */
+  var AI_PROXY = /^https?:\/\/[^\s]+/.test(String(AI_CFG.endpoint || '')) ? String(AI_CFG.endpoint).replace(/\/+$/, '') : '';
+  var AI_URL = AI_PROXY || 'https://generativelanguage.googleapis.com/v1beta';
+  var AI_ON = !!((AI_PROXY || AI_KEY) && window.fetch);
   var MH_FLAGS = ['estres', 'sueno', 'aislamiento', 'animo_bajo', 'ansiedad', 'conflicto', 'riesgo'];
   var bot = { open: false, tab: 'chat', msgs: [], busy: false, recId: null, dirty: false, who: null, t0: 0, greeted: false };
   var kbCache = {};
@@ -2343,7 +2346,7 @@
   }
   function gemini(sys, contents, json) {
     return fetch(AI_URL + '/models/' + AI_MODEL + ':generateContent', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': AI_KEY },
+      method: 'POST', headers: AI_KEY ? { 'Content-Type': 'application/json', 'x-goog-api-key': AI_KEY } : { 'Content-Type': 'application/json' },
       body: JSON.stringify({ system_instruction: { parts: [{ text: sys }] }, contents: contents,
         generationConfig: json ? { temperature: 0.2, maxOutputTokens: 2048, responseMimeType: 'application/json' } : { temperature: 0.6, maxOutputTokens: 2048 } })
     }).then(function (res) {
