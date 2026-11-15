@@ -179,6 +179,8 @@
     botTyping: { es: 'Kibo está escribiendo', en: 'Kibo is typing' },
     botErr: { es: 'No pude responder ahora. Revisa la conexión e inténtalo de nuevo.', en: 'I could not answer right now. Check the connection and try again.' },
     botSetup: { es: 'El asistente aún no está activado. Falta poner la dirección del servidor de Kibo en config.js (instrucciones en ASISTENTE.md).', en: 'The assistant is not enabled yet. The Kibo server address is missing in config.js (instructions in ASISTENTE.md).' },
+    botTimeout: { es: 'El servidor tardó más de 60 segundos en responder.', en: 'The server took more than 60 seconds to answer.' },
+    botNoNet: { es: 'No se pudo conectar con el servidor de Kibo. Revisa la dirección en config.js y que el Worker esté desplegado.', en: 'Could not reach the Kibo server. Check the address in config.js and that the Worker is deployed.' },
     botSaved: { es: 'Kibo guardó el resumen de la conversación', en: 'Kibo saved the conversation summary' },
     botQ1: { es: '¿Cómo están mis mediciones de hoy?', en: 'How are my measurements today?' },
     botQ2: { es: 'Quiero conversar un rato', en: 'I want to talk for a while' },
@@ -2265,7 +2267,7 @@
      De cada conversacion guarda un resumen breve y un nivel de animo (1 a 5), nunca el texto completo. */
   var AI_CFG = window.CREWVITAL_AI || {};
   var AI_KEY = String(AI_CFG.apiKey || '').trim();
-  var AI_MODEL = String(AI_CFG.model || 'gemini-flash-latest').replace(/[^A-Za-z0-9._-]/g, '') || 'gemini-flash-latest';
+  var AI_MODEL = String(AI_CFG.model || 'gemini-4-hydrogen').replace(/[^A-Za-z0-9._-]/g, '') || 'gemini-4-hydrogen';
   /* endpoint: direccion del servidor intermedio (Cloudflare Worker) que guarda la clave. Recomendado.
      Sin endpoint, la app habla directo con Google y necesita apiKey (queda visible en el sitio). */
   var AI_PROXY = /^https?:\/\/[^\s]+/.test(String(AI_CFG.endpoint || '')) ? String(AI_CFG.endpoint).replace(/\/+$/, '') : '';
@@ -2344,19 +2346,34 @@
       '9. La persona ya sabe que de la conversación se guarda un resumen y un nivel de ánimo que el oficial médico puede ver. No prometas confidencialidad total.\n\n' +
       'DATOS DEL TRIPULANTE\n' + crewContext(who) + '\n\nBASE DE CONOCIMIENTO (NASA HRP y contenidos de CrewVital, en JSON)\n' + knowledge();
   }
+  /* aiFast: pide a Gemini responder sin "pensar" (mucho mas rapido). Si el modelo no lo admite, se desactiva solo. */
+  var aiFast = true;
   function gemini(sys, contents, json) {
+    var cfg = json ? { temperature: 0.2, maxOutputTokens: 2048, responseMimeType: 'application/json' } : { temperature: 0.6, maxOutputTokens: 2048 };
+    if (aiFast) cfg.thinkingConfig = { thinkingBudget: 0 };
+    var ctl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 60000);
     return fetch(AI_URL + '/models/' + AI_MODEL + ':generateContent', {
       method: 'POST', headers: AI_KEY ? { 'Content-Type': 'application/json', 'x-goog-api-key': AI_KEY } : { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ system_instruction: { parts: [{ text: sys }] }, contents: contents,
-        generationConfig: json ? { temperature: 0.2, maxOutputTokens: 2048, responseMimeType: 'application/json' } : { temperature: 0.6, maxOutputTokens: 2048 } })
+      signal: ctl ? ctl.signal : undefined,
+      body: JSON.stringify({ system_instruction: { parts: [{ text: sys }] }, contents: contents, generationConfig: cfg })
     }).then(function (res) {
-      return res.json().then(function (j) {
-        if (!res.ok) throw new Error((j && j.error && j.error.message) || ('HTTP ' + res.status));
-        var c = j.candidates && j.candidates[0];
-        var t = c && c.content && c.content.parts ? c.content.parts.map(function (p) { return p.text || ''; }).join('') : '';
+      return res.text().then(function (txt) {
+        clearTimeout(timer);
+        var j = null; try { j = JSON.parse(txt); } catch (e) { /* respuesta que no es JSON */ }
+        if (!res.ok) {
+          var msg = (j && j.error && j.error.message) || ('HTTP ' + res.status + ' ' + txt.slice(0, 120));
+          if (aiFast && res.status === 400) { aiFast = false; return gemini(sys, contents, json); }
+          throw new Error(msg);
+        }
+        var c = j && j.candidates && j.candidates[0];
+        var t = c && c.content && c.content.parts ? c.content.parts.filter(function (p) { return !p.thought; }).map(function (p) { return p.text || ''; }).join('') : '';
         if (!t) throw new Error(c && c.finishReason ? c.finishReason : 'respuesta vacía');
         return t;
-      }, function () { throw new Error('HTTP ' + res.status); });
+      });
+    }, function (err) {
+      clearTimeout(timer);
+      throw new Error(err && err.name === 'AbortError' ? u('botTimeout') : (u('botNoNet') + ' (' + (err && err.message || err) + ')'));
     });
   }
   function toContents(msgs) {

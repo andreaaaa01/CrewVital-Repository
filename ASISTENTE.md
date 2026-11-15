@@ -85,7 +85,7 @@ Los nombres de los botones pueden variar un poco según la versión del panel.
 ```js
 window.CREWVITAL_AI = {
   endpoint: 'https://crewvital-kibo.tu-usuario.workers.dev',
-  model: 'gemini-flash-latest'
+  model: 'gemini-4-hydrogen'
 };
 ```
 
@@ -93,9 +93,9 @@ window.CREWVITAL_AI = {
    y recarga la app dos veces.
 5. Entra como tripulante, abre a Kibo y pulsa una de las preguntas sugeridas.
 
-`model`: `gemini-flash-latest` usa siempre el Gemini Flash más reciente. Si
-prefieres fijar una versión, escribe su nombre exacto (por ejemplo
-`gemini-2.5-flash`); la lista vigente está en Google AI Studio.
+`model`: debe ser un modelo vigente. Google retira modelos con el tiempo; la lista
+actual aparece en `modelos_flash` al abrir `<dirección-del-worker>/test`. Para probar
+uno concreto: `<dirección-del-worker>/test?model=gemini-4-hydrogen`.
 
 ## Cosas que conviene saber
 
@@ -131,7 +131,10 @@ Kibo muestra el mensaje de error en letra pequeña dentro del chat.
   volver a desplegar el Worker.
 - **"API key not valid" o "permission denied":** la clave está mal copiada o la
   cuenta con la que se creó tiene restringida la API; créala con una cuenta personal.
-- **"not found" con el nombre del modelo:** cambia `model` por un modelo vigente.
+- **"not found" o "no longer available":** el modelo fue retirado; cambia `model`
+  por uno de la lista de `<dirección-del-worker>/test`.
+- **Kibo se queda cargando o da error 504:** abre `<dirección-del-worker>/test` para
+  ver qué responde Google con cada modelo.
 - **"quota" o 429:** se alcanzó el límite gratuito; espera un minuto.
 - **"Failed to fetch":** la dirección del Worker en `endpoint` está mal escrita o
   no hay conexión.

@@ -14,10 +14,10 @@ window.CREWVITAL_SYNC = {
    1) endpoint: direccion de tu servidor intermedio en Cloudflare
       (ejemplo: 'https://crewvital-kibo.tu-usuario.workers.dev'). La clave de Gemini
       se guarda alla, no en este archivo. Dejalo vacio ('') para mostrar a Kibo sin conversacion.
-   2) model: modelo de Gemini. 'gemini-flash-latest' usa siempre el Flash mas reciente.
+   2) model: modelo de Gemini. Usa un nombre de la lista que muestra <tu-worker>/test (modelos_flash).
    NO pegues aqui la clave de Gemini: este archivo es publico.
    Instrucciones paso a paso: ASISTENTE.md */
 window.CREWVITAL_AI = {
-  endpoint: 'https://crewvital-kibo.crewvitalproyectonasa.workers.dev/',
-  model: 'gemini-flash-latest'
+  endpoint: 'https://crewvital-kibo.crewvitalproyectonasa.workers.dev',
+  model: 'gemini-4-hydrogen'
 };
