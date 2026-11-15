@@ -847,7 +847,11 @@
     }
     h += '<div class="row" style="margin-top:1rem"><button class="btn primary" data-action="measureInd" data-v="' + id + '">' + esc(u('measureNow')) + '</button><button class="btn" data-action="closeDlg">' + esc(u('close')) + '</button></div>';
     var dlg = $('dlg'); dlg.innerHTML = h;
-    if (dlg.showModal) { dlg.showModal(); } else { dlg.setAttribute('open', ''); }
+    dlgOpen(dlg);
+  }
+  function dlgOpen(dlg) {
+    if (dlg.showModal) { if (!dlg.open) dlg.showModal(); } else { dlg.setAttribute('open', ''); }
+    if (!(history.state && history.state.dlg)) history.pushState({ cv: navLoc(), dlg: 1 }, '', location.href);
   }
   function closeDlg() { var d = $('dlg'); if (d.open) { if (d.close) { d.close(); } else { d.removeAttribute('open'); } } }
   function rangeText(f) {
@@ -1027,7 +1031,7 @@
     if (worst === 2) h += '<p><button class="btn danger" data-action="sos">' + esc(u('openEm')) + '</button></p>';
     h += '<div class="row" style="justify-content:flex-end;margin-top:1rem"><button class="btn" data-action="closeDlg">' + esc(u('dgFinBack')) + '</button><button class="btn primary" data-action="dgFinishGo">' + esc(u('dgFinConfirm')) + '</button></div></div>';
     var dlg = $('dlg'); dlg.innerHTML = h;
-    if (dlg.showModal) { dlg.showModal(); } else { dlg.setAttribute('open', ''); }
+    dlgOpen(dlg);
   }
   function measureForm(ind) {
     var h = '<form class="box dg-form" id="mform" novalidate><p class="small muted">' + esc(u('dgZone')) + ': ' + esc(T(REGIONS[ind.region].name)) + '</p><h3>' + esc(T(ind.name)) + '</h3>';
@@ -1544,7 +1548,7 @@
     var dlg = $('dlg');
     dlg.innerHTML = '<div class="nm"><h2>' + esc(u('newMission')) + '</h2><p>' + esc(u(SYNC_ON ? 'nmTextSync' : 'nmText')) + '</p><div class="row"><button class="btn" data-action="pdf" data-v="all">' + esc(u('reportPdfAll')) + '</button></div>' +
       '<label class="chk"><input type="checkbox" id="nmCrew" checked> ' + esc(u('nmCrew')) + '</label><div class="row" style="justify-content:flex-end;margin-top:1rem"><button class="btn" data-action="closeDlg">' + esc(u('cancel')) + '</button><button class="btn danger" data-action="nmGo">' + esc(u('nmConfirm')) + '</button></div></div>';
-    if (dlg.showModal) { dlg.showModal(); } else { dlg.setAttribute('open', ''); }
+    dlgOpen(dlg);
   }
   function newMission() {
     var c = $('nmCrew'), resetCrew = !c || c.checked, d = defaults();
@@ -1734,6 +1738,36 @@
     else if (t === 'settings') renderSettings();
     else renderScience();
   }
+  /* ---------- boton Atras del navegador (history.state) ---------- */
+  var navRestoring = false, navSkip = false;
+  function navLoc() { return { role: state.role || null, tab: state.tab, dg: { mode: state.dg.mode, region: state.dg.region }, sel: state.sel || null, region: state.region || null, medMode: state.medMode || null, em: { sc: state.em.sc, node: state.em.node } }; }
+  function locUrl() { return location.pathname + location.search + '#/' + (state.role ? state.tab : 'rol'); }
+  function pushLoc() {
+    if (navRestoring || !window.history || !history.pushState) return;
+    var l = navLoc(), cur = history.state && history.state.cv;
+    if (cur && JSON.stringify(cur) === JSON.stringify(l)) return;
+    history.pushState({ cv: l }, '', locUrl());
+  }
+  function applyLoc(l) {
+    var role = l.role;
+    if (state.lock) role = 'crew';
+    state.role = role; state.tab = TABS.indexOf(l.tab) >= 0 ? l.tab : homeTab();
+    state.dg = { mode: l.dg ? l.dg.mode : null, region: l.dg ? l.dg.region : null };
+    state.sel = l.sel; state.region = l.region; state.medMode = l.medMode;
+    state.em = { sc: l.em ? l.em.sc : null, node: l.em ? l.em.node : null };
+    lastResult = null;
+    if (menuOpen) setMenu(false, true);
+    save(); navRestoring = true; render(); navRestoring = false; window.scrollTo(0, 0);
+  }
+  window.addEventListener('popstate', function (ev) {
+    if (navSkip) { navSkip = false; return; }
+    var d = $('dlg');
+    if (d && d.open) { navRestoring = true; closeDlg(); navRestoring = false; return; }
+    if (ev.state && ev.state.cv) applyLoc(ev.state.cv);
+  });
+  $('dlg').addEventListener('close', function () {
+    if (!navRestoring && history.state && history.state.dlg) { navSkip = true; history.back(); }
+  });
   function go(tab) {
     if (tab === 'body' || tab === 'measure') tab = 'diag';
     state.tab = tab; save();
@@ -1813,7 +1847,7 @@
   }
   document.addEventListener('click', function (ev) {
     var el = ev.target.closest ? ev.target.closest('[data-action]') : null;
-    if (el) { onAction(el); }
+    if (el) { onAction(el); pushLoc(); }
   });
   document.addEventListener('keydown', function (ev) {
     var t = ev.target;
@@ -2502,6 +2536,7 @@
   document.addEventListener('visibilitychange', function () { if (document.hidden) botSaveRecord(true); });
 
   render();
+  if (window.history && history.replaceState) history.replaceState({ cv: navLoc() }, '', locUrl());
   var shownDay = today();
   function checkDay() { if (today() !== shownDay) { shownDay = today(); render(); } }
   setInterval(checkDay, 60000);
