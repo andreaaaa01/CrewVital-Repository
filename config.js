@@ -16,6 +16,6 @@ window.CREWVITAL_SYNC = {
    2) model: modelo de Gemini. 'gemini-flash-latest' usa siempre el Flash mas reciente.
    Instrucciones y como restringir la clave: ASISTENTE.md */
 window.CREWVITAL_AI = {
-  apiKey: '',
+  apiKey: 'AQ.Ab8RN6I-Mld8Hkh0jFo-BeCgU9BQaClE5NeIwni8b7ypi1MdCg',
   model: 'gemini-flash-latest'
 };
