@@ -1,0 +1,18 @@
+{
+  "name": "CrewVital - Monitoreo de salud para astronautas",
+  "short_name": "CrewVital",
+  "id": "./index.html",
+  "description": "Monitoreo de salud para tripulaciones espaciales: mediciones, semáforo, guía de emergencia e informes médicos. Funciona sin conexión.",
+  "lang": "es",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

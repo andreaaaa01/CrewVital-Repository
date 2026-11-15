@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CrewVital - Monitoreo de salud para astronautas</title>
+<meta name="description" content="Monitoreo de salud para tripulaciones espaciales: mediciones, semáforo, guía de emergencia e informes médicos. Funciona sin conexión.">
+<meta name="theme-color" content="#0b1220">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="boot"><canvas aria-hidden="true"></canvas><div class="boot-brand"><img src="nasa-logo.svg" alt="NASA" width="110" height="92"><b>CrewVital</b><span>Monitoreo de salud para tripulaciones · Crew health monitoring</span></div><button class="boot-skip" type="button">Saltar intro</button></div>
+<a class="skip" href="#main">Saltar al contenido / Skip to content</a>
+<header id="top"></header>
+<nav id="drawer" aria-label="Menú / Menu" aria-hidden="true" inert></nav>
+<div id="scrim" data-action="menuClose" aria-hidden="true"></div>
+<main id="main" tabindex="-1"></main>
+<footer id="foot"></footer>
+<dialog id="dlg"></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+<noscript><p style="padding:1rem">Esta aplicación necesita JavaScript activado. This app needs JavaScript enabled.</p></noscript>
+<script src="config.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
