@@ -9,3 +9,13 @@ window.CREWVITAL_SYNC = {
   databaseURL: 'https://crewvital-c2bc1-default-rtdb.firebaseio.com',
   mission: 'mision-1'
 };
+
+/* Asistente Kibo (IA con Gemini).
+   1) apiKey: clave de la API de Gemini (se obtiene gratis en https://aistudio.google.com/apikey).
+      Dejala vacia ('') para mostrar a Kibo sin conversacion.
+   2) model: modelo de Gemini. 'gemini-flash-latest' usa siempre el Flash mas reciente.
+   Instrucciones y como restringir la clave: ASISTENTE.md */
+window.CREWVITAL_AI = {
+  apiKey: '',
+  model: 'gemini-flash-latest'
+};

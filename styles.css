@@ -461,3 +461,69 @@ html.bg-plain #sky { display: none; }
 .anat2 .lbl.sel .lead { stroke-opacity: 1; stroke-width: 1.6; }
 .anat2 .lbl.sel .ring { stroke-opacity: 1; stroke-width: 1.8; }
 .anat2 .lbl:hover text:first-of-type, .anat2 .lbl.sel text:first-of-type { fill: #fff; }
+
+/* ---------- asistente Kibo (marciano en ovni) ---------- */
+body.has-bot main { padding-bottom: 7rem; }
+#bot { position: fixed; right: 1rem; bottom: 1rem; z-index: 40; display: flex; flex-direction: column; align-items: flex-end; gap: .5rem; pointer-events: none; }
+#bot > * { pointer-events: auto; }
+.ufo.lg { width: 92px; height: 92px; display: block; }
+.ufo.sm { width: 44px; height: 44px; flex: none; }
+.ufo-lights circle { fill: #ffd84d; }
+.ufo-lights circle:nth-child(even) { fill: #7df0ff; }
+.bot-fab { position: relative; background: none; border: 0; padding: 0; cursor: pointer; border-radius: 50%; filter: drop-shadow(0 6px 14px rgba(80, 140, 255, .55)); }
+.bot-fab:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.bot-fab:hover .ufo-body { transform: translateY(-3px) rotate(-3deg); }
+.ufo-body { transform-origin: 60px 70px; transition: transform .25s; }
+.bot-fab.open .ufo.lg { width: 64px; height: 64px; }
+.bot-hi { position: absolute; right: 86px; bottom: 38px; white-space: nowrap; background: #16204a; color: var(--text); border: 1px solid var(--accent); border-radius: 14px 14px 2px 14px; padding: .4rem .7rem; font-size: .85rem; font-weight: 600; }
+@media (prefers-reduced-motion: no-preference) {
+  .bot-fab .ufo.lg { animation: ufofloat 3.6s ease-in-out infinite; }
+  .ufo-lights circle { animation: ufoblink 1.6s steps(2) infinite; }
+  .ufo-lights circle:nth-child(even) { animation-delay: .8s; }
+  .ufo-beam { animation: ufobeam 3.6s ease-in-out infinite; }
+  .bot-msg.typing i { animation: botdot 1s ease-in-out infinite; }
+  .bot-msg.typing i:nth-child(2) { animation-delay: .15s; } .bot-msg.typing i:nth-child(3) { animation-delay: .3s; }
+}
+@keyframes ufofloat { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-9px) rotate(2deg); } }
+@keyframes ufoblink { 50% { opacity: .35; } }
+@keyframes ufobeam { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@keyframes botdot { 0%, 100% { transform: translateY(0); opacity: .4; } 50% { transform: translateY(-4px); opacity: 1; } }
+.bot-panel { width: min(380px, calc(100vw - 2rem)); height: min(560px, calc(100vh - 9rem)); display: flex; flex-direction: column; background: #0c1430; border: 1px solid var(--accent); border-radius: 16px; overflow: hidden; box-shadow: 0 18px 50px rgba(0, 0, 0, .6); }
+.bot-head { display: flex; align-items: center; gap: .5rem; padding: .5rem .7rem; background: linear-gradient(135deg, #1b2a5c, #2a1b5c); }
+.bot-title { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.2; }
+.bot-title span { font-size: .75rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bot-ic { background: none; border: 1px solid transparent; color: var(--text); font-size: 1.3rem; line-height: 1; width: 2.1rem; height: 2.1rem; border-radius: 8px; cursor: pointer; }
+.bot-ic:hover, .bot-ic:focus-visible { border-color: var(--accent); }
+.bot-tabs { display: flex; border-bottom: 1px solid var(--line); }
+.bot-tabs button { flex: 1; background: none; border: 0; border-bottom: 3px solid transparent; color: var(--muted); padding: .5rem; font: inherit; font-size: .88rem; cursor: pointer; }
+.bot-tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); font-weight: 700; }
+.bot-body { flex: 1; overflow-y: auto; padding: .7rem; display: flex; flex-direction: column; gap: .5rem; }
+.bot-note { color: var(--muted); border: 1px dashed var(--line); border-radius: 8px; padding: .4rem .6rem; margin: 0; }
+.bot-msg { max-width: 88%; padding: .5rem .75rem; border-radius: 14px; font-size: .92rem; line-height: 1.45; overflow-wrap: anywhere; }
+.bot-msg.model { align-self: flex-start; background: #16204a; border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+.bot-msg.user { align-self: flex-end; background: var(--accent2); color: #fff; border-bottom-right-radius: 4px; }
+.bot-msg.err { align-self: stretch; max-width: none; background: #2a1414; border: 1px solid var(--bad); }
+.bot-msg.typing { display: flex; gap: .3rem; padding: .7rem .8rem; }
+.bot-msg.typing i { width: .45rem; height: .45rem; border-radius: 50%; background: var(--muted); }
+.bot-sug { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .2rem; }
+.bot-sug .chip { cursor: pointer; font: inherit; font-size: .82rem; background: none; color: var(--text); }
+.bot-sug .chip:hover { border-color: var(--accent); }
+.bot-form { display: flex; gap: .4rem; padding: .5rem; border-top: 1px solid var(--line); }
+.bot-form textarea { flex: 1; resize: none; min-height: 2.6rem; max-height: 6rem; background: #05070f; color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: .55rem .7rem; font: inherit; font-size: .92rem; }
+.bot-form .btn { align-self: stretch; padding: 0 .9rem; font-size: 1.1rem; }
+.mh-list { list-style: none; margin: .4rem 0 0; padding: 0; display: grid; gap: .5rem; }
+.mh-item { border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 8px; padding: .45rem .6rem; background: var(--panel2); }
+.mh-item .row { justify-content: space-between; }
+.mh-item p { margin: .3rem 0 0; }
+.mh-item .chips { margin-top: .3rem; }
+.mh-item.risk, .mh-crew.risk { border-color: var(--bad); border-left-color: var(--bad); }
+.chip.danger { border-color: var(--bad); color: var(--bad); font-weight: 700; }
+.alert.danger { border-color: var(--bad); background: #2a1414; }
+.mh-box { margin: .8rem 0; }
+@media (max-width: 640px) {
+  #bot { right: .5rem; bottom: .5rem; }
+  .ufo.lg { width: 74px; height: 74px; }
+  .bot-hi { right: 70px; bottom: 28px; }
+  .bot-panel { width: calc(100vw - 1rem); height: min(70vh, calc(100vh - 8rem)); }
+}
+@media print { #bot { display: none; } }
